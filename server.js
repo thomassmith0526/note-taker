@@ -1,9 +1,10 @@
 const express = require("express");
-
+const fs = require("fs")
 const PORT = 3002;
+const path = require('path')
 
 const app = express();
-const noteid = require("./Develop/public/helpers/id");
+const noteid = require("./express/public/helpers/id");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,7 +20,7 @@ app.get("/api/notes", (req, res) => {
   console.info(`${req.method} request received to get notes`);
 });
 
-app.post("api/notes", (req, res) => {
+app.post("/api/notes", (req, res) => {
   console.info(`${req.method} request received to add a note`);
   const { title, text } = req.body;
 
@@ -32,11 +33,11 @@ app.post("api/notes", (req, res) => {
 
     const noteSrting = JSON.stringify(newNote);
 
-    fs.writeFlie(`./db/${newNote.title}.josn`, noteSrting, (err) =>
+    fs.writeFile(`./express/db/db.json`, noteSrting, (err) =>
       err
         ? console.error(err)
         : console.log(
-            `Review for ${newNote.title} has been written to JSON file`
+            `Note for ${newNote.title} has been written to JSON file`
           )
     );
     const response = {
