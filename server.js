@@ -1,15 +1,17 @@
 const express = require("express");
 const fs = require("fs")
-const PORT = 3002;
+const PORT = process.env.PORT || 3002;
+
 const path = require('path')
-const fsPromises = require('fs').promises;
+
 const app = express();
 const noteId = require("./express/public/helpers/id");
-const { json } = require("body-parser");
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+
+app.use(express.static('public'));
 
 // API paths
 app.get("/", (req, res) =>
@@ -17,13 +19,12 @@ app.get("/", (req, res) =>
 );
 
 app.get('/notes', (req, res) => 
-  res.sendFile(path.join(__dirname, '/express/public/notes.html'))
+  res.sendFile(path.join(__dirname, '/express/public/index.html'))
 );
 
 //API GET
-app.get("/api/notes", (req, res) => {
-  fsPromises.readFile('./express/db/db.json','UTF-8', (err,data) => data)
-  .then((data) => res.json(JSON.parse(data)))
+app.get("/api/notes", (req, res) => {                                                                                                             
+  res.json(`${req.method} request received to get notes`)
 
   console.info(`${req.method} request received to get notes`);
 });
@@ -39,18 +40,22 @@ app.post("/api/notes", (req, res) => {
       id: noteId(),
     };
 
- 
+  fs.readFile('./express/db/db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      const parsedNotes = JSON.parse(data)
+      console.log(data)
+      parsedNotes.push(newNote)
 
-    const noteString = JSON.stringify(newNote);
-    
+      fs.writeFile('./express/db/db.json', JSON.stringify(parsedNotes, null, 4), (writeErr) =>
+        writeErr
+          ? console.error(writeErr)
+          : console.info('Successfully updated notes')
+        );
+    }
+  });
 
-    fs.writeFile(`./express/db/db.json`, noteString, (err) =>
-      err
-        ? console.error(err)
-        : console.log(
-            `Note for ${newNote.title} has been written to JSON file`
-          )
-    );
     const response = {
       status: "success",
       body: newNote,
