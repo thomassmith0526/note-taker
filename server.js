@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs")
 const PORT = process.env.PORT || 3002;
-const base = ("./db/db.json")
+let db  = require('./db/db.json')
 const path = require('path')
 
 const app = express();
@@ -24,8 +24,9 @@ app.get('/notes', (req, res) =>
 
 //API GET
 app.get("/api/notes", (req, res) => {    
-  return(base)                                                                                                         
-  
+  // return(base)  
+  db=  JSON.parse( fs.readFileSync("./db/db.json")) || []
+  res.json(db)
 });
 // API POST
 app.post("/api/notes", (req, res) => {
@@ -39,19 +40,24 @@ app.post("/api/notes", (req, res) => {
       id: noteId(),
     };
 
-  fs.readFile('./express/db/db.json', 'utf8', (err, data) => {
+  fs.readFile('./db/db.json', 'utf8', (err, data) => {
     if (err) {
       console.error(err);
     } else {
       const parsedNotes = JSON.parse(data)
       console.log(data)
       parsedNotes.push(newNote)
-
-      fs.writeFile('./express/db/db.json', JSON.stringify(parsedNotes, null, 4), (writeErr) =>
+      db = parsedNotes
+      fs.writeFile('./db/db.json', JSON.stringify(parsedNotes, null, 4), (writeErr) =>
         writeErr
           ? console.error(writeErr)
           : console.info('Successfully updated notes')
         );
+      
+    //     readAndAppend(newNote, './db/db.json');
+    //     res.json(`note added successfully`)
+    // } else {
+    //   res.error('Error in adding note')
     }
   });
 
