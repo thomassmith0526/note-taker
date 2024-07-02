@@ -25,7 +25,7 @@ app.get('/notes', (req, res) =>
 //API GET
 app.get("/api/notes", (req, res) => {    
   // return(base)  
-  db=  JSON.parse( fs.readFileSync("./db/db.json")) || []
+  db =  JSON.parse(fs.readFileSync("./db/db.json")) || []
   res.json(db)
 });
 // API POST
@@ -54,10 +54,7 @@ app.post("/api/notes", (req, res) => {
           : console.info('Successfully updated notes')
         );
       
-    //     readAndAppend(newNote, './db/db.json');
-    //     res.json(`note added successfully`)
-    // } else {
-    //   res.error('Error in adding note')
+    
     }
   });
 
